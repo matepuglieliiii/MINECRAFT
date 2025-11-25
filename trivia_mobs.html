@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Trivia Mobs</title>
+  <style>
+    #resultado button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+    }
+  </style>
+</head>
+<body onload="iniciarTrivia()">
+  <div id="trivia">
+    <h2 id="pregunta"></h2>
+    <div id="opciones"></div>
+  </div>
+
+  <video autoplay muted loop id="bgVideo">
+    <source src="minecraft.mp4" type="video/mp4" />
+    Tu navegador no soporta video HTML5.
+  </video>
+
+  <div id="resultado" style="display:none;">
+    <h2>¡Felicidades, has terminado la trivia!</h2>
+    <p id="puntajeFinal"></p>
+    <button onclick="volverInicio()">Volver al inicio</button>
+  </div>
+
+  <script>
+    const bancoPreguntas = {
+      mobs: [
+      { pregunta: "¿Cuál es el máximo de personas en un bote?", opciones: ["2", "3", "4", "5"], correcta: "2" },
+        { pregunta: "¿Cuál es la verdadera skin original del ahogado?", opciones: ["Steve", "Zombie", "Esqueleto", "Husk"], correcta: "Zombie" },
+        { pregunta: "¿Cuál es el sonido del que proviene el zorro?", opciones: ["Gato", "Lobo", "Pez", "Murciélago"], correcta: "Lobo" },
+        { pregunta: "¿Los gatos en Minecraft pueden sobrevivir lo mismo o más que un gato en la vida real a una caída?", opciones: ["Sí", "No", "Solo si tienen botas", "Depende del modo de juego"], correcta: "Sí" },
+        { pregunta: "¿Cuál es la cantidad máxima de mobs hostiles que pueden aparecer en un chunk cargado?", opciones: ["70", "80", "100", "120"], correcta: "70" },
+        { pregunta: "¿Cuántas cabezas tiene el Wither?", opciones: ["1", "2", "3", "4"], correcta: "3" },
+        { pregunta: "¿Qué animales aparecen en el bioma de manglares?", opciones: ["Ranas", "Murciélagos", "Zorros", "Caballos"], correcta: "Ranas" },
+        { pregunta: "¿Cuántos oficios de aldeanos hay?", opciones: ["10", "13", "15", "20"], correcta: "13" },
+        { pregunta: "¿El Wither spawnea esqueletos Wither cuando es invocado?", opciones: ["No", "Sí", "Solo en modo difícil", "Solo en el Nether"], correcta: "No" },
+        { pregunta: "¿Las champivacas son familiares de las vacas?", opciones: ["Sí", "No", "Son mutaciones", "Son mobs únicos"], correcta: "Sí" },
+        { pregunta: "¿Herobrine es real dentro del juego?", opciones: ["Sí", "No", "A veces", "Solo con mods"], correcta: "No" },
+        { pregunta: "¿Cuál es la probabilidad de que spawneen caballos esqueletos?", opciones: ["Muy baja", "1%", "5%", "10%"], correcta: "Muy baja" },
+        { pregunta: "¿A partir de cuántas noches sin dormir aparecen los Phantom?", opciones: ["1", "2", "3", "4"], correcta: "3" },
+        { pregunta: "¿Cuál es la probabilidad de obtener una cabeza de Wither Esqueleto?", opciones: ["2.5%", "5%", "1%", "10%"], correcta: "2.5%" },
+        { pregunta: "¿Cuál es la probabilidad de spawneo del ajolote azul?", opciones: ["0.083%", "1%", "5%", "10%"], correcta: "0.083%" },
+        { pregunta: "¿En qué se convierte la champivaca cuando le cae un rayo?", opciones: ["Champivaca marrón", "Vaca normal", "Explota", "Nada"], correcta: "Champivaca marrón" },
+        { pregunta: "¿Qué mob spawnean los aldeanos cuando se sienten atacados?", opciones: ["Golem de hierro", "Golem de nieve", "Perros", "Guardias"], correcta: "Golem de hierro" },
+        { pregunta: "¿Qué oficio de aldeano tradea ender pearls?", opciones: ["Clérigo", "Cartógrafo", "Herrero", "Pastor"], correcta: "Clérigo" },
+        { pregunta: "¿Las flechas de los esqueletos de la nieve qué efecto te dan?", opciones: ["Lentitud", "Daño", "Veneno", "Ninguno"], correcta: "Lentitud" },
+        { pregunta: "¿Qué mob vuela y tiene espada?", opciones: ["Vex", "Ghast", "Enderman", "Warden"], correcta: "Vex" }
+   
+      ]
+    };
+
+    let preguntas = [];
+    let indice = 0;
+    let puntaje = 0;
+
+    function mezclarArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function iniciarTrivia() {
+      preguntas = bancoPreguntas.mobs;
+      document.getElementById("trivia").style.display = "block";
+      mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+      const p = preguntas[indice];
+      document.getElementById("pregunta").textContent = p.pregunta;
+      const opcionesDiv = document.getElementById("opciones");
+      opcionesDiv.innerHTML = "";
+
+      let opcionesMezcladas = mezclarArray([...p.opciones]);
+
+      opcionesMezcladas.forEach((op) => {
+        const btn = document.createElement("button");
+        btn.textContent = op;
+        btn.style.backgroundImage = "url('boton.png')";
+        btn.onclick = () => {
+          if (op === p.correcta) puntaje++;
+          siguientePregunta();
+        };
+        opcionesDiv.appendChild(btn);
+      });
+    }
+
+    function siguientePregunta() {
+      indice++;
+      if (indice < preguntas.length) {
+        mostrarPregunta();
+      } else {
+        terminarTrivia();
+      }
+    }
+
+    function terminarTrivia() {
+      document.getElementById("trivia").style.display = "none";
+      document.getElementById("resultado").style.display = "block";
+      document.getElementById("puntajeFinal").textContent = `Tu puntaje fue: ${puntaje}`;
+
+      guardarEnRanking();
+    }
+
+    function guardarEnRanking() {
+      const nombre = localStorage.getItem("nombreJugador") || "Anónimo";
+      const categoria = "mobs";
+
+      let ranking = JSON.parse(localStorage.getItem("ranking")) || {
+        general: [],
+        bloques: [],
+        mobs: [],
+      };
+
+      if (!ranking[categoria]) ranking[categoria] = [];
+
+      ranking[categoria].push({ nombre, puntos: puntaje });
+
+      ranking[categoria].sort((a, b) => b.puntos - a.puntos);
+      ranking[categoria] = ranking[categoria].slice(0, 100);
+
+      localStorage.setItem("ranking", JSON.stringify(ranking));
+    }
+
+    function volverInicio() {
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

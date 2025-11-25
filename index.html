@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trivia Minecraft</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <video autoplay muted loop id="bgVideo">
+    <source src="minecraft.mp4" type="video/mp4" />
+    Tu navegador no soporta video HTML5.
+  </video>
+
+  <div id="inicio">
+    <h1>Trivia Minecraft</h1>
+    <input type="text" id="nombreUsuario" placeholder="Ingresa tu nombre" />
+    <br />
+    <button onclick="mostrarCategorias()" class="btn-jugar">Seleccionar Categoría</button>
+    <button onclick="irRanking()" class="btn-ranking">Ranking</button>
+  </div>
+
+  <div id="categorias" style="display:none;">
+    <h2>Elige una categoría</h2>
+    <button onclick="setCategoria('general')" class="btn-general">General</button>
+    <button onclick="setCategoria('bloques')" class="btn-bloques">Bloques</button>
+    <button onclick="setCategoria('mobs')" class="btn-mobs">Mobs</button>
+    <br />
+    <button onclick="jugar()" class="btn-jugar">Jugar</button>
+  </div>
+
+  <script>
+    let categoriaSeleccionada = "";
+
+    function mostrarCategorias() {
+      const nombre = document.getElementById("nombreUsuario").value.trim();
+      if (!nombre) {
+        alert("Por favor ingresa tu nombre para continuar.");
+        return;
+      }
+      localStorage.setItem("nombreJugador", nombre);
+      document.getElementById("inicio").style.display = "none";
+      document.getElementById("categorias").style.display = "block";
+    }
+
+    function setCategoria(categoria) {
+      categoriaSeleccionada = categoria;
+      alert("Categoría seleccionada: " + categoria);
+    }
+
+    function jugar() {
+      if (!categoriaSeleccionada) {
+        alert("Por favor selecciona una categoría.");
+        return;
+      }
+      localStorage.setItem("categoriaTrivia", categoriaSeleccionada);
+
+      // Redirigir a la página correspondiente según la categoría
+      if (categoriaSeleccionada === "general") {
+        window.location.href = "trivia_general.html";
+      } else if (categoriaSeleccionada === "bloques") {
+        window.location.href = "trivia_bloques.html";
+      } else if (categoriaSeleccionada === "mobs") {
+        window.location.href = "trivia_mobs.html";
+      }
+    }
+
+    function irRanking() {
+      window.location.href = "trivia_ranking.html";
+    }
+  </script>
+</body>
+</html>
+  

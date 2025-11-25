@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Trivia General</title>
+  <style>
+    #resultado button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+    }
+  </style>
+</head>
+<body onload="iniciarTrivia()">
+  <div id="trivia">
+    <h2 id="pregunta"></h2>
+    <div id="opciones"></div>
+  </div>
+
+  <video autoplay muted loop id="bgVideo">
+    <source src="minecraft.mp4" type="video/mp4" />
+    Tu navegador no soporta video HTML5.
+  </video>
+
+  <div id="resultado" style="display:none;">
+    <h2>¡Felicidades, has terminado la trivia!</h2>
+    <p id="puntajeFinal"></p>
+    <button onclick="volverInicio()">Volver al inicio</button>
+  </div>
+
+  <script>
+    const bancoPreguntas = {
+      general: [
+      {
+    pregunta: "¿Cuál es el máximo de personas en un bote?",
+    opciones: ["5", "3", "2", "4"],
+    correcta: "2"
+  },
+  {
+    pregunta: "¿Cuál es la verdadera skin original del ahogado?",
+    opciones: ["Foto 1", "Foto 2", "Foto 3", "Steve"],
+    correcta: "Foto 2" // Asumiendo "Zombie" es la correcta según antes, aquí debes ajustar según tu contenido de imágenes
+  },
+  {
+    pregunta: "¿Cuál es el sonido del que proviene el zorro?",
+    opciones: ["Zorro real", "Un gato y un perro", "Un caballo", "Una vaca"],
+    correcta: "Un gato y un perro"
+  },
+  {
+    pregunta: "¿Los gatos en Minecraft pueden sobrevivir lo mismo o más que un gato en la vida real a una caída?",
+    opciones: ["Verdadero", "Falso"],
+    correcta: "Verdadero"
+  },
+  {
+    pregunta: "¿Cuál es la cantidad máxima de mobs hostiles que pueden aparecer en un chunk cargado?",
+    opciones: ["52", "33", "45", "70"],
+    correcta: "70"
+  },
+  {
+    pregunta: "¿Cuántas cabezas tiene el mob Wither?",
+    opciones: ["1", "3", "2", "4"],
+    correcta: "3"
+  },
+  {
+    pregunta: "¿Qué animales aparecen en el bioma de manglares?",
+    opciones: ["Luciernagas", "Sapos", "Vacas", "Todas las anteriores"],
+    correcta: "Todas las anteriores" // O "ninguna de las anteriores" si quieres
+  },
+  {
+    pregunta: "¿Cuántos oficios de aldeanos hay?",
+    opciones: ["10", "13", "12", "50"],
+    correcta: "13"
+  },
+  {
+    pregunta: "¿El Wither spawnea esqueletos Wither cuando es invocado?",
+    opciones: ["Verdadero", "Falso"],
+    correcta: "Falso"
+  },
+  {
+    pregunta: "¿Las champivacas son familiares de las vacas?",
+    opciones: ["Verdadero", "Falso"],
+    correcta: "Verdadero"
+  },
+  {
+    pregunta: "¿Herobrine es real dentro del juego?",
+    opciones: ["Verdadero", "Falso"],
+    correcta: "Falso"
+  },
+  {
+    pregunta: "¿Cuál es la probabilidad de que spawneen los caballos esqueletos (en difícil)?",
+    opciones: ["6.75%", "3.25%", "10.50%", "5%"],
+    correcta: "Muy baja" // Según antes es "Muy baja", ajusta aquí
+  },
+  {
+    pregunta: "¿A partir de cuántas noches sin dormir aparecen los Phantom?",
+    opciones: ["2 días", "5 días", "1 día", "3 días"],
+    correcta: "3 días"
+  },
+  {
+    pregunta: "¿Cuál es la probabilidad de la cabeza de Wither Esqueleto?",
+    opciones: ["2.5%", "5%", "3%", "1%"],
+    correcta: "2.5%"
+  },
+  {
+    pregunta: "¿Cuál es la probabilidad de spawneo del ajolote azul?",
+    opciones: ["0.083%", "0.0022%", "0.0057%", "1%"],
+    correcta: "0.083%"
+  },
+  {
+    pregunta: "¿En qué se convierte la champivaca cuando le cae un rayo?",
+    opciones: ["Se transforma en una vaca normal", "Se muere", "Se transforma en una champivaca marrón", "Nada"],
+    correcta: "Se transforma en una champivaca marrón"
+  },
+  {
+    pregunta: "¿Qué mob spawnean los aldeanos cuando se sienten atacados?",
+    opciones: ["Un gigante", "Un golem", "Un aldeano guerrero", "Un perro"],
+    correcta: "Un golem"
+  },
+  {
+    pregunta: "¿Qué oficio de aldeano tradea ender pearls?",
+    opciones: ["Aldeano granjero", "Aldeano clérigo", "Aldeano herrero", "Aldeano librero"],
+    correcta: "Aldeano clérigo"
+  },
+  {
+    pregunta: "¿Las flechas de los esqueletos de la nieve qué efecto te dan?",
+    opciones: ["Veneno", "Hambre", "Ceguera", "Lentitud"],
+    correcta: "Lentitud"
+  },
+  {
+    pregunta: "¿Qué mob vuela y tiene espada?",
+    opciones: ["Murciélago", "Vex", "Ghast", "Phantom"],
+    correcta: "Vex"
+  }
+      ]
+    };
+
+    let preguntas = [];
+    let indice = 0;
+    let puntaje = 0;
+
+    // Función para mezclar un array
+    function mezclarArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function iniciarTrivia() {
+      preguntas = bancoPreguntas.general;
+      document.getElementById("trivia").style.display = "block";
+      mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+      const p = preguntas[indice];
+      document.getElementById("pregunta").textContent = p.pregunta;
+      const opcionesDiv = document.getElementById("opciones");
+      opcionesDiv.innerHTML = "";
+
+      // Mezclar opciones antes de mostrarlas
+      let opcionesMezcladas = mezclarArray([...p.opciones]);
+
+      opcionesMezcladas.forEach((op) => {
+        const btn = document.createElement("button");
+        btn.textContent = op;
+        btn.style.backgroundImage = "url('boton.png')";
+        btn.onclick = () => {
+          if (op === p.correcta) puntaje++;
+          siguientePregunta();
+        };
+        opcionesDiv.appendChild(btn);
+      });
+    }
+
+    function siguientePregunta() {
+      indice++;
+      if (indice < preguntas.length) {
+        mostrarPregunta();
+      } else {
+        terminarTrivia();
+      }
+    }
+
+    function terminarTrivia() {
+      document.getElementById("trivia").style.display = "none";
+      document.getElementById("resultado").style.display = "block";
+      document.getElementById("puntajeFinal").textContent = `Tu puntaje fue: ${puntaje}`;
+
+      guardarEnRanking();
+    }
+
+    function guardarEnRanking() {
+      const nombre = localStorage.getItem("nombreJugador") || "Anónimo";
+      const categoria = "general";
+
+      let ranking = JSON.parse(localStorage.getItem("ranking")) || {
+        general: [],
+        bloques: [],
+        mobs: [],
+      };
+
+      if (!ranking[categoria]) ranking[categoria] = [];
+
+      ranking[categoria].push({ nombre, puntos: puntaje });
+
+      ranking[categoria].sort((a, b) => b.puntos - a.puntos);
+      ranking[categoria] = ranking[categoria].slice(0, 100);
+
+      localStorage.setItem("ranking", JSON.stringify(ranking));
+    }
+
+    function volverInicio() {
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
